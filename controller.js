@@ -65,8 +65,21 @@ const login = async (req, res) => {
         const usuario = await client.query(sql, [email])
         const validPassword = bcryptjs.compareSync(senha, usuario.rows[0].senha)
         console.log(validPassword)
+        // todo fazer if else se o password for valido
+        const token = jwt.sign(
+            {
+                _id: usuario.rows[0].id,
+                email: usuario.rows[0].email,
+                nome: usuario.rows[0].nome,
+            },
+            process.env.jwt_secret_key,
+            { expiresIn: 1000*60*60*24*3}
+        )
 
-        res.send(200)
+        res
+        .status(200)
+        .cookie("ROGERIO", token, {})
+        .json({msg: 'vc efetuou login'})
 
     }catch (err){
         console.log(err)
